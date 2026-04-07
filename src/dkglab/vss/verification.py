@@ -1,3 +1,5 @@
+"""Verification of shares against Feldman commitments."""
+
 from __future__ import annotations
 
 from typing import Sequence

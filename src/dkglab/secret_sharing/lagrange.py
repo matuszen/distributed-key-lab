@@ -1,3 +1,5 @@
+"""Lagrange interpolation helpers for finite-field secret recovery."""
+
 from __future__ import annotations
 
 from typing import Sequence

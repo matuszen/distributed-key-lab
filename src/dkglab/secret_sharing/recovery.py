@@ -1,10 +1,12 @@
+"""Secret reconstruction API based on Lagrange interpolation."""
+
 from __future__ import annotations
 
 from typing import Sequence
 
 from dkglab.crypto.curves import GROUP_ORDER
-from dkglab.utils.types import Share
 from dkglab.secret_sharing.lagrange import interpolate_at_zero
+from dkglab.utils.types import Share
 
 
 def recover_secret(
