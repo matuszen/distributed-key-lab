@@ -1,3 +1,5 @@
+"""Shared type definitions for domain modules."""
+
 from dataclasses import dataclass
 
 
