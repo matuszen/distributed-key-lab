@@ -26,26 +26,26 @@ The repository uses a domain-oriented layout:
 
 ## Run
 
-1. Create and activate a virtual environment:
+### Create and activate a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-2. Install dependencies:
+### Install dependencies
 
 ```bash
 pip install -e .[dev]
 ```
 
-3. Validate the curve setup (secp256k1):
+### Validate the curve setup (secp256k1)
 
 ```bash
 python3 setup_check.py
 ```
 
-4. Run tests:
+### Run tests
 
 ```bash
 pytest

@@ -1,7 +1,7 @@
 from dkglab.crypto.curves import GROUP_ORDER
 from dkglab.utils.types import Share
-from dkglab.vss.feldman import build_feldman_commitments
-from dkglab.vss.verification import verify_share
+from dkglab.vss.feldman import build_feldman_commitments, create_vss_package
+from dkglab.vss.verification import verify_share, verify_vss_package
 
 
 def poly_eval(coeffs: list[int], x: int, modulus: int) -> int:
@@ -40,3 +40,24 @@ def test_verify_share_false_for_tampered_commitment() -> None:
 
     commitments[0] = commitments[0] + commitments[1]
     assert not verify_share(share=share, commitments=commitments)
+
+
+def test_verify_vss_package_true_for_valid_data() -> None:
+    coeffs = [100, 200, 300]
+    idx = 5
+
+    share = Share(x=idx, y=poly_eval(coeffs, idx, GROUP_ORDER))
+    package = create_vss_package(share, coeffs)
+
+    assert verify_vss_package(package) is True
+
+
+def test_verify_vss_package_false_for_wrong_share() -> None:
+    coeffs = [10, 20, 30]
+    idx = 1
+
+    y_val = poly_eval(coeffs, idx, GROUP_ORDER)
+    corrupted_share = Share(x=idx, y=y_val + 1)
+    bad_package = create_vss_package(corrupted_share, coeffs)
+
+    assert verify_vss_package(bad_package) is False
