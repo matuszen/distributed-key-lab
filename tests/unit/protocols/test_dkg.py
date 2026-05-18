@@ -12,9 +12,17 @@ def test_dkg_round_aggregates_consistently() -> None:
 
     aggregated_secret = sum(secrets) % GROUP_ORDER
 
+    commitments_list = []
+    for participant in result.participants:
+        assert participant.commitments is not None
+        commitments_list.append(participant.commitments)
+
     for participant in result.participants:
         assert participant.final_share is not None
         assert verify_share(participant.final_share, result.aggregated_commitments)
+        assert (
+            participant.compute_joint_public_key(commitments_list) == result.public_key
+        )
 
     final_shares = [
         participant.final_share

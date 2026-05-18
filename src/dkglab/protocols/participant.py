@@ -116,6 +116,12 @@ class Participant:
             raise ValueError("Commitments not available.")
         return self.commitments[0]
 
+    def compute_joint_public_key(
+        self, commitments_list: Sequence[Sequence[Point]]
+    ) -> Point:
+        """Compute the joint public key from all participants' commitments."""
+        return Participant.aggregate_public_key(commitments_list)
+
     @staticmethod
     def aggregate_public_key(commitments_list: Sequence[Sequence[Point]]) -> Point:
         """Aggregate commitment-0 points into a joint public key."""
