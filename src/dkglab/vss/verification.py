@@ -7,7 +7,7 @@ from typing import Sequence
 from ecdsa.ellipticcurve import INFINITY, Point
 
 from dkglab.crypto.curves import GENERATOR, GROUP_ORDER
-from dkglab.utils.types import Share
+from dkglab.utils.types import Share, VSSPackage
 
 
 def verify_share(
@@ -31,3 +31,8 @@ def verify_share(
         rhs = rhs + scalar * commitment
 
     return lhs == rhs
+
+
+def verify_vss_package(package: VSSPackage) -> bool:
+    """Verify a share using commitments bundled in a VSS package."""
+    return verify_share(share=package.share, commitments=package.commitments)

@@ -7,6 +7,7 @@ from typing import Iterable, List
 from ecdsa.ellipticcurve import Point
 
 from dkglab.crypto.curves import GENERATOR, GROUP_ORDER
+from dkglab.utils.types import Share, VSSPackage
 
 
 def build_feldman_commitments(
@@ -16,3 +17,9 @@ def build_feldman_commitments(
     for coefficient in coefficients:
         commitments.append((coefficient % modulus) * GENERATOR)
     return commitments
+
+
+def create_vss_package(share: Share, coefficients: List[int]) -> VSSPackage:
+    """Create a verifiable share package with public commitments."""
+    commitments = build_feldman_commitments(coefficients)
+    return VSSPackage(share=share, commitments=commitments)
