@@ -32,10 +32,5 @@ def verify_share(
 
 
 def verify_vss_package(package: VSSPackage) -> bool:
-    """
-    Higher-level verification using the VSSPackage object.
-    """
-    return verify_share(
-        share=package.share,
-        commitments=package.commitments
-    )
+    """Higher-level verification using the VSSPackage object."""
+    return verify_share(share=package.share, commitments=package.commitments)

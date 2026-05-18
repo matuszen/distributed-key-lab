@@ -3,8 +3,8 @@ from itertools import combinations
 import pytest
 
 from dkglab.crypto.curves import GROUP_ORDER
-from dkglab.utils.types import Share
 from dkglab.secret_sharing.recovery import recover_secret
+from dkglab.utils.types import Share
 
 
 def poly_eval(coeffs: list[int], x: int, modulus: int) -> int:

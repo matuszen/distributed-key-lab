@@ -18,16 +18,16 @@ def build_feldman_commitments(
 
 
 def create_vss_package(share: Share, coefficients: List[int]) -> VSSPackage:
-    """
-    Creates a Verifiable Secret Sharing package.
-    
+    """Create a Verifiable Secret Sharing package.
+
     Args:
         share: The private share for a participant.
         coefficients: The secret polynomial coefficients.
-        
+
     Returns:
         A VSSPackage containing the share and public commitments.
+
     """
     commitments = build_feldman_commitments(coefficients)
-    
+
     return VSSPackage(share=share, commitments=commitments)
