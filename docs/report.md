@@ -1,42 +1,43 @@
-# Raport końcowy
+# Final Report
 
-## Temat
+## Topic
 
-Rozproszona generacja klucza i podpis progowy Schnorra w modelu `t-of-n`.
+Distributed Key Generation and threshold Schnorr signatures in a `t-of-n` model.
 
-## Streszczenie
+## Abstract
 
-Projekt implementuje kompletną ścieżkę edukacyjną od parametrów krzywej eliptycznej, przez Shamir Secret Sharing i Feldman VSS, po lokalną symulację DKG oraz podpis progowy Schnorra. Główny scenariusz demonstracyjny to portfel `3 z 5`, w którym dowolnych trzech uczestników może podpisać wiadomość, ale dwóch uczestników jest blokowanych przed podpisywaniem.
+The project implements a complete educational path from elliptic-curve parameters, through Shamir Secret Sharing and Feldman VSS, to a local DKG simulation and threshold Schnorr signing. The main demonstration scenario is a `3-of-5` wallet: any three participants can sign a message, while two participants are blocked before signing.
 
-## Środowisko
+## Environment
 
 - Python 3.10+
 - `ecdsa`
 - `pytest`
 - `ruff`
 - `isort`
-- krzywa `SECP256k1`
+- `SECP256k1`
 
-## Metody
+## Method
 
-1. Parametry kryptograficzne sprawdzono przez `setup_check.py`.
-2. Sekret podzielono przez wielomian Shamira nad rzędem grupy.
-3. Poprawność udziałów zabezpieczono commitmentami Feldmana.
-4. DKG zrealizowano jako lokalną wymianę pakietów VSS między obiektami `Participant`.
-5. Wspólny klucz publiczny wyliczono jako sumę publicznych contribution.
-6. Podpis progowy zbudowano na partial signatures ważonych współczynnikami Lagrange'a.
+1. Cryptographic parameters are validated by `setup_check.py`.
+2. The secret is split with a Shamir polynomial over the group order.
+3. Share correctness is protected with Feldman commitments.
+4. DKG is implemented as local VSS package exchange between `Participant` objects.
+5. The joint public key is derived from public contributions.
+6. Threshold signing is built from Lagrange-weighted partial signatures.
 
-## Wyniki
+## Results
 
-- Testy jednostkowe pokrywają SSS, VSS, DKG, Schnorra, TSS oraz przykłady.
-- Demo `threshold_wallet_3of5.py` generuje podpis przechodzący `verify_signature`.
-- Demo `attack_t_minus_one.py` blokuje próbę podpisu przez mniej niż próg.
-- Benchmark DKG pokazuje prosty trend kosztu wraz ze wzrostem liczby uczestników.
+- Unit tests cover SSS, VSS, DKG, Schnorr, TSS, GUI services, and examples.
+- `threshold_wallet_3of5.py` produces a signature accepted by `verify_signature`.
+- `attack_t_minus_one.py` blocks a signing attempt below the threshold.
+- The DKG benchmark shows a simple timing trend as the number of participants grows.
+- The Tkinter GUI exposes the main demonstrations through forms.
 
-## Ograniczenia
+## Limits
 
-Implementacja jest akademicka. Nie jest pełnym FROST i nie obejmuje sieci, trwałego storage, ochrony przed side-channel ani produkcyjnej obsługi złośliwych uczestników. Nonce w przykładach bywają deterministyczne dla powtarzalności testów; kod domyślny używa `secrets`.
+The implementation is academic. It is not full FROST and does not include networking, persistent storage, side-channel protection, or production-grade malicious participant handling. Deterministic secrets and nonces appear in tests and demos for reproducibility; default protocol helpers use `secrets`.
 
-## Wniosek
+## Conclusion
 
-Projekt spełnia cel zaliczeniowy: pokazuje matematyczne podstawy, weryfikowalność udziałów, rozproszoną generację wspólnego klucza publicznego i poprawny podpis progowy bez odtwarzania pełnego klucza prywatnego w ścieżce podpisywania.
+The project meets its educational goal: it shows the mathematical foundation, share verifiability, distributed generation of a joint public key, and a valid threshold signature without reconstructing the full private key during the signing path.

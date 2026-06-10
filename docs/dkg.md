@@ -1,48 +1,48 @@
 # Distributed Key Generation
 
-## Cel
+## Goal
 
-DKG pozwala wielu uczestnikom wygenerować wspólny klucz publiczny `PK`, przy czym pełny klucz prywatny `SK` nigdy nie istnieje w jednym miejscu w ścieżce protokołu.
+DKG allows multiple participants to derive one joint public key `PK` while the full private key `SK` never exists in one place during the protocol path.
 
-## Przebieg symulacji
+## Simulation Flow
 
-1. Każdy uczestnik losuje własny sekret `x_j`.
-2. Każdy uczestnik buduje wielomian Shamira stopnia `t-1`.
-3. Każdy uczestnik publikuje commitmenty Feldmana do współczynników.
-4. Każdy uczestnik wysyła odpowiedni udział do każdego innego uczestnika.
-5. Odbiorcy weryfikują udziały przez Feldman VSS.
-6. Każdy uczestnik sumuje zaakceptowane udziały i swój udział własny.
-7. Powstaje finalny udział prywatny `sk_i`.
-8. Wspólny klucz publiczny to suma commitmentów stałych:
+1. Each participant samples its own secret `x_j`.
+2. Each participant builds a Shamir polynomial of degree `t-1`.
+3. Each participant publishes Feldman commitments to the polynomial coefficients.
+4. Each participant sends the appropriate share to every other participant.
+5. Receivers verify shares with Feldman VSS.
+6. Each participant sums accepted shares plus its own local share.
+7. The result is the participant's final private share `sk_i`.
+8. The joint public key is the sum of constant commitments:
 
 ```text
 PK = C_0,1 + C_0,2 + ... + C_0,n
 ```
 
-## Publiczne udziały
+## Public Shares
 
-Projekt wylicza też publiczny odpowiednik finalnego udziału:
+The project also computes the public counterpart of each final private share:
 
 ```text
 Y_i = F(i) * G
 ```
 
-gdzie `F` jest sumą wszystkich wielomianów. `Y_i` jest potrzebny do weryfikacji częściowych podpisów.
+where `F` is the sum of all dealer polynomials. `Y_i` is used to verify threshold partial signatures.
 
-## Implementacja
+## Implementation
 
-Moduły:
+Modules:
 
 - `dkglab.protocols.participant`
 - `dkglab.protocols.dkg`
 
-Najważniejsze elementy:
+Key elements:
 
 - `Participant`
 - `run_dkg(num_participants, threshold)`
 - `DKGResult`
 - `public_share_for_index(aggregated_commitments, participant_id)`
 
-## Charakter symulacji
+## Simulation Character
 
-To lokalna symulacja akademicka. Nie modeluje sieci, opóźnień, uwierzytelnienia wiadomości ani trwałego przechowywania udziałów.
+This is a local academic simulation. It does not model networking, latency, message authentication, or persistent share storage.

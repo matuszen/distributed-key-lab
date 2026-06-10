@@ -2,41 +2,41 @@
 
 ## Idea
 
-Sekret `a_0` jest stałym wyrazem wielomianu:
+The secret `a_0` is the constant term of a polynomial:
 
 ```text
 f(x) = a_0 + a_1*x + ... + a_(t-1)*x^(t-1) mod n
 ```
 
-gdzie `n` to rząd grupy krzywej `SECP256k1`. Udział uczestnika `i` to punkt:
+where `n` is the group order of `SECP256k1`. Participant `i` receives:
 
 ```text
 share_i = (i, f(i))
 ```
 
-Dowolne `t` udziałów pozwala odtworzyć `f(0)`, czyli sekret. Mniej niż `t` udziałów nie wystarcza do jednoznacznego odtworzenia wielomianu.
+Any `t` shares can reconstruct `f(0)`, which is the secret. Fewer than `t` shares do not determine the polynomial uniquely.
 
-## Implementacja
+## Implementation
 
-Moduły:
+Modules:
 
 - `dkglab.secret_sharing.splitting`
 - `dkglab.secret_sharing.lagrange`
 - `dkglab.secret_sharing.recovery`
 
-Ważne decyzje:
+Important decisions:
 
-- indeksy udziałów są dodatnie i unikalne,
-- sekret jest skalarem z zakresu `[1, n-1]`,
-- dla `threshold > 1` najwyższy współczynnik wielomianu jest niezerowy,
-- rekonstrukcja używa interpolacji Lagrange'a w punkcie `x=0`.
+- share indexes must be positive and unique,
+- the secret is a scalar in `[1, n-1]`,
+- for `threshold > 1`, the highest polynomial coefficient is non-zero,
+- reconstruction uses Lagrange interpolation at `x=0`.
 
-## Testy
+## Tests
 
-Testy sprawdzają:
+The tests cover:
 
-- podział sekretu na `5` udziałów,
-- rekonstrukcję z dowolnych `3`,
-- błąd przy `2` udziałach dla progu `3`,
-- odrzucenie duplikatów indeksów,
-- poprawność współczynników Lagrange'a dla niekolejnych indeksów, np. `{2, 4, 5}`.
+- splitting one secret into `5` shares,
+- reconstruction from any valid set of `3`,
+- failure with `2` shares when the threshold is `3`,
+- rejection of duplicate indexes,
+- Lagrange coefficients for non-consecutive indexes such as `{2, 4, 5}`.

@@ -24,8 +24,8 @@ sudo apt install python3-tk
 The script prints:
 
 - curve name,
-- base point coordinates G,
-- group order n,
+- base point coordinates `G`,
+- group order `n`,
 - a basic group relation sanity check.
 
 The final line should be:

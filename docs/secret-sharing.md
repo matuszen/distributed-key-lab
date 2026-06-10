@@ -10,6 +10,6 @@ The `recover_secret` function reconstructs the constant term using Lagrange inte
 
 ## Implementation Notes
 
-- x indices must be positive and unique,
-- fewer than t shares raises an error,
+- `x` indexes must be positive and unique,
+- fewer than `t` shares raises an error,
 - arithmetic is performed modulo the selected field order.

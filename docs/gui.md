@@ -1,56 +1,56 @@
-# Aplikacja okienkowa
+# Desktop GUI
 
-## Cel
+## Goal
 
-Projekt zawiera prostą aplikację okienkową w Pythonie, która pozwala uruchomić główne funkcjonalności bez pisania komend w terminalu:
+The project includes a simple Python desktop application that runs the main project functionality without requiring terminal commands:
 
-- podgląd parametrów krzywej,
+- curve parameter preview,
 - Shamir Secret Sharing,
-- DKG dla scenariusza `3 z 5`,
-- podpis progowy Schnorra,
-- symulację ataku `t-1`,
-- benchmark DKG.
+- DKG for the `3-of-5` scenario,
+- threshold Schnorr signing,
+- `t-1` attack simulation,
+- DKG benchmark.
 
-## Technologia
+## Technology
 
-Aplikacja używa standardowego `tkinter`. Nie wymaga dodatkowej biblioteki z `pip`, ale systemowy Python musi mieć dostępny moduł Tk.
+The app uses standard `tkinter`. It does not require an additional `pip` dependency, but the system Python must provide the Tk module.
 
-Na Ubuntu/Debian zwykle wystarczy:
+On Ubuntu/Debian this is usually installed with:
 
 ```bash
 sudo apt install python3-tk
 ```
 
-Następnie zainstaluj projekt:
+Then install the project:
 
 ```bash
 pip install -e .[dev]
 ```
 
-## Uruchomienie
+## Running the App
 
-Po instalacji entry pointu:
+After installing the entry point:
 
 ```bash
 dkglab-gui
 ```
 
-Alternatywnie:
+Alternatively:
 
 ```bash
 python examples/gui_app.py
 ```
 
-albo:
+or:
 
 ```bash
 python -m dkglab.gui.app
 ```
 
-## Zakładki
+## Tabs
 
-- `Start`: szybkie akcje demonstracyjne.
-- `SSS`: formularz sekretu, progu i liczby uczestników.
-- `DKG / TSS`: podpis wiadomości przez wybranych uczestników, atak `t-1` i benchmark.
+- `Start`: quick demo actions.
+- `SSS`: form for secret, threshold, and participant count.
+- `DKG / TSS`: message signing by selected participants, `t-1` attack, and benchmark.
 
-Wynik każdej akcji jest pokazywany w panelu tekstowym po prawej stronie.
+Each action writes its result to the text panel on the right side of the window.

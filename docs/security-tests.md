@@ -1,30 +1,30 @@
-# Scenariusze testów bezpieczeństwa
+# Security Test Scenarios
 
-## Testy pozytywne
+## Positive Tests
 
-- SSS odzyskuje sekret z dowolnych `t` udziałów.
-- VSS akceptuje poprawny udział.
-- DKG generuje jeden wspólny `PK` dla wszystkich uczestników.
-- TSS 3 z 5 tworzy podpis przechodzący standardową weryfikację Schnorra.
-- TSS działa dla niekolejnych uczestników, np. `{2, 4, 5}`.
+- SSS reconstructs a secret from any valid set of `t` shares.
+- VSS accepts a valid share.
+- DKG produces one joint `PK` for all participants.
+- TSS 3-of-5 creates a signature that passes standard Schnorr verification.
+- TSS works for non-consecutive participants, for example `{2, 4, 5}`.
 
-## Testy negatywne
+## Negative Tests
 
-- SSS odrzuca rekonstrukcję z `t-1` udziałów.
-- VSS odrzuca zmodyfikowany udział.
-- VSS odrzuca zmodyfikowany commitment.
-- DKG odrzuca błędnie zaadresowany albo zdublowany udział.
-- Sesja TSS odrzuca mniej niż `t` uczestników.
-- Sesja TSS odrzuca podmieniony partial signature.
-- Finalna weryfikacja Schnorra odrzuca:
-  - inną wiadomość,
-  - inny klucz publiczny,
-  - podmieniony punkt `R`.
+- SSS rejects reconstruction with `t-1` shares.
+- VSS rejects a modified share.
+- VSS rejects a modified commitment.
+- DKG rejects a misrouted or duplicated share.
+- TSS rejects fewer than `t` selected participants.
+- TSS rejects a tampered partial signature.
+- Final Schnorr verification rejects:
+  - a different message,
+  - a different public key,
+  - a modified point `R`.
 
-## Uruchomienie
+## Running Tests
 
 ```bash
 pytest -q
 ```
 
-Smoke testy przykładów są częścią testów jednostkowych i sprawdzają najważniejsze komendy demonstracyjne.
+Smoke tests for the console examples are included in the unit test suite and cover the main demonstration commands.

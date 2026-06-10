@@ -1,4 +1,4 @@
-# Przykłady użycia
+# Use Cases
 
 ## Setup
 
@@ -8,79 +8,79 @@ source .venv/bin/activate
 pip install -e .[dev]
 ```
 
-## Parametry krzywej
+## Curve Parameters
 
 ```bash
 python setup_check.py
 ```
 
-Oczekiwane elementy wyniku:
+Expected output includes:
 
-- `Curve: SECP256k1`
-- współrzędne `G.x` i `G.y`,
-- rząd grupy `n`,
+- `Curve: SECP256k1`,
+- `G.x` and `G.y`,
+- group order `n`,
 - `Sanity check n*G == INFINITY: True`.
 
-## Demo DKG
+## DKG Demo
 
 ```bash
 python examples/dkg_demo.py
 ```
 
-Pokazuje:
+Shows:
 
-- liczbę uczestników,
-- próg,
-- wspólny klucz publiczny `PK`,
-- publiczną weryfikację finalnych udziałów.
+- participant count,
+- threshold,
+- joint public key `PK`,
+- public verification of final shares.
 
-## Portfel 3 z 5
+## 3-of-5 Wallet
 
 ```bash
 python examples/threshold_wallet_3of5.py
 ```
 
-Oczekiwany wynik zawiera:
+Expected output includes:
 
 ```text
 Use case: threshold wallet 3-of-5
 Signature valid: True
 ```
 
-## Atak t-1
+## t-1 Attack
 
 ```bash
 python examples/attack_t_minus_one.py
 ```
 
-Oczekiwany wynik:
+Expected output:
 
 ```text
 Attack blocked: Not enough selected participants for threshold.
 ```
 
-## Benchmark DKG
+## DKG Benchmark
 
 ```bash
 python examples/benchmark_dkg.py
 ```
 
-Wynik ma format CSV:
+The output is CSV-like:
 
 ```text
 n,t,time_ms
 ```
 
-## Aplikacja okienkowa
+## Desktop GUI
 
 ```bash
 python examples/gui_app.py
 ```
 
-Po ponownym `pip install -e .[dev]` można też użyć entry pointu:
+After reinstalling the editable package, the script entry point is also available:
 
 ```bash
 dkglab-gui
 ```
 
-Aplikacja pozwala wykonać te same scenariusze z formularzy: SSS, DKG, podpis progowy, atak `t-1` i benchmark.
+The app exposes the same scenarios through forms: SSS, DKG, threshold signing, the `t-1` attack, and the benchmark.

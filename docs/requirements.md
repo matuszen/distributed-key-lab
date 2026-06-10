@@ -1,38 +1,38 @@
-# Specyfikacja wymagań
+# Requirements Specification
 
-## Cel projektu
+## Project Goal
 
-Projekt demonstruje akademicką implementację rozproszonej generacji klucza (DKG) i podpisu progowego Schnorra dla schematu `t-of-n`. System ma pokazać, że:
+The project demonstrates an academic implementation of Distributed Key Generation (DKG) and threshold Schnorr signatures for a `t-of-n` setting. The system should show that:
 
-- sekret może zostać podzielony metodą Shamira,
-- poprawność udziałów można sprawdzić przez Feldman VSS,
-- grupa uczestników może wygenerować wspólny klucz publiczny bez składania pełnego klucza prywatnego,
-- dowolne co najmniej `t` poprawnych udziałów może wygenerować podpis,
-- mniej niż `t` uczestników nie przechodzi ścieżki podpisywania.
+- a secret can be split with Shamir Secret Sharing,
+- share correctness can be verified with Feldman VSS,
+- participants can derive a joint public key without reconstructing the full private key,
+- any valid group of at least `t` participants can produce a signature,
+- fewer than `t` participants cannot start a valid signing path.
 
-## Zakres funkcjonalny
+## Functional Scope
 
-- Python 3.10+ i biblioteka `ecdsa`.
-- Krzywa `SECP256k1`.
-- Shamir Secret Sharing nad rzędem grupy krzywej.
-- Feldman VSS na punktach krzywej.
-- Lokalna symulacja DKG w pamięci procesu.
-- Lokalny podpis Schnorra i weryfikacja podpisu.
-- Edukacyjny podpis progowy Schnorra bez odtwarzania pełnego `SK`.
-- Przykłady konsolowe i testy automatyczne.
+- Python 3.10+ and the `ecdsa` library.
+- `SECP256k1` curve parameters.
+- Shamir Secret Sharing over the curve group order.
+- Feldman VSS commitments on elliptic-curve points.
+- Local in-memory DKG simulation.
+- Local Schnorr signing and verification.
+- Educational threshold Schnorr signing without reconstructing the full private key.
+- Console examples, a Tkinter desktop app, automated tests, and Markdown documentation.
 
-## Poza zakresem
+## Out of Scope
 
-- Pełny protokół FROST.
-- Sieć, transport wiadomości i autoryzacja uczestników.
-- Ochrona side-channel.
-- Trwałe przechowywanie udziałów.
-- Produkcyjna obsługa awarii i karanie uczestników.
+- Full FROST implementation.
+- Networking, transport security, and participant authentication.
+- Side-channel protection.
+- Persistent private-share storage.
+- Production-grade failure handling or slashing for malicious participants.
 
-## Kryteria akceptacji
+## Acceptance Criteria
 
-- `python setup_check.py` drukuje parametry krzywej i potwierdza `n*G == INFINITY`.
-- `pytest` przechodzi wszystkie testy.
-- `examples/threshold_wallet_3of5.py` kończy się `Signature valid: True`.
-- `examples/attack_t_minus_one.py` kończy się komunikatem `Attack blocked`.
-- Dokumentacja opisuje założenia bezpieczeństwa i ograniczenia implementacji.
+- `python setup_check.py` prints curve parameters and confirms `n*G == INFINITY`.
+- `pytest` passes.
+- `examples/threshold_wallet_3of5.py` ends with `Signature valid: True`.
+- `examples/attack_t_minus_one.py` ends with `Attack blocked`.
+- The Markdown documentation explains the security assumptions and implementation limits.

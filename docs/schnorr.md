@@ -1,8 +1,8 @@
-# Podpis Schnorra
+# Schnorr Signature
 
-## Lokalny algorytm
+## Local Algorithm
 
-Dla klucza prywatnego `x`, klucza publicznego `PK = x*G` i wiadomości `m`:
+For private key `x`, public key `PK = x*G`, and message `m`:
 
 ```text
 R = k * G
@@ -11,19 +11,19 @@ s = k + e*x mod n
 signature = (R, s)
 ```
 
-Weryfikacja:
+Verification:
 
 ```text
 s * G == R + e * PK
 ```
 
-## Implementacja
+## Implementation
 
-Moduł:
+Module:
 
 - `dkglab.crypto.schnorr`
 
-Funkcje:
+Functions:
 
 - `generate_keypair()`
 - `sign_message(private_key, message)`
@@ -32,6 +32,6 @@ Funkcje:
 - `point_to_hex(point)`
 - `scalar_to_hex(value)`
 
-## Uwagi
+## Notes
 
-`compute_challenge` jest publiczne, bo podpis progowy używa dokładnie tej samej wartości `e` dla częściowych podpisów i finalnej weryfikacji.
+`compute_challenge` is public because threshold signing must use exactly the same challenge `e` as the final Schnorr verifier.

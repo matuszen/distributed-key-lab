@@ -1,60 +1,63 @@
-# Podpis progowy Schnorra
+# Threshold Schnorr Signing
 
-## Cel
+## Goal
 
-Po DKG każdy uczestnik ma tylko swój udział `sk_i`. Projekt implementuje podpis, w którym wybrani uczestnicy wspólnie tworzą podpis Schnorra bez odtwarzania pełnego `SK`.
+After DKG, each participant holds only its private share `sk_i`. The project implements a signing path where selected participants jointly create a Schnorr signature without reconstructing the full private key `SK`.
 
-## Przebieg dla wybranych uczestników
+## Flow for Selected Participants
 
-1. Koordynator wybiera co najmniej `t` uczestników.
-2. Każdy wybrany uczestnik generuje nonce `k_i` i publikuje `R_i = k_i*G`.
-3. Sesja sumuje commitmenty nonce:
+### The coordinator selects at least `t` participants
+
+### Each selected participant generates a nonce `k_i` and publishes `R_i = k_i*G`
+
+### The session aggregates nonce commitments
 
 ```text
 R = R_1 + R_2 + ... + R_t
 ```
 
-4. Wszyscy liczą challenge:
+### Everyone computes the challenge
 
 ```text
 e = H(R, PK, m)
 ```
 
-5. Każdy uczestnik liczy współczynnik Lagrange'a `lambda_i` dla zbioru podpisującego.
-6. Częściowy podpis:
+### Each participant computes its Lagrange coefficient `lambda_i` for the signing set
+
+### The partial signature is
 
 ```text
 z_i = k_i + e * lambda_i * sk_i mod n
 ```
 
-7. Agregator sprawdza część:
+### The aggregator verifies each partial signature
 
 ```text
 z_i*G == R_i + e*lambda_i*Y_i
 ```
 
-gdzie `Y_i = F(i)G` pochodzi z publicznych commitmentów DKG.
+where `Y_i = F(i)G` comes from the public DKG commitments.
 
-8. Finalny podpis:
+### The final signature is
 
 ```text
 s = sum(z_i) mod n
 signature = (R, s)
 ```
 
-Finalna weryfikacja używa zwykłej funkcji Schnorra:
+The standard Schnorr verifier is used for the final check:
 
 ```text
 verify_signature(PK, message, signature)
 ```
 
-## Implementacja
+## Implementation
 
-Moduł:
+Module:
 
 - `dkglab.protocols.threshold_signature`
 
-Elementy:
+Elements:
 
 - `ThresholdSigningSession`
 - `NonceShare`
@@ -64,6 +67,6 @@ Elementy:
 - `verify_partial_signature`
 - `aggregate_signatures`
 
-## Ograniczenia bezpieczeństwa
+## Security Limits
 
-To edukacyjny protokół progowy, nie pełny FROST. Projekt nie implementuje produkcyjnego mechanizmu binding factors, ochrony przed ponownym użyciem nonce ani sieciowej obsługi oszustów. Te ograniczenia są świadome i opisane, aby nie przedstawiać implementacji jako gotowej do użycia w portfelu produkcyjnym.
+This is an educational threshold protocol, not full FROST. The project does not implement production binding factors, nonce-reuse protection, or network-level malicious participant handling. These limits are explicit so the implementation is not presented as a production wallet protocol.

@@ -1,64 +1,65 @@
-# Szkic prezentacji
+# Presentation Outline
 
-## Slajd 1: Cel projektu
+## Slide 1: Project Goal
 
-- DKG i podpis progowy `t-of-n`.
-- Przykład: wspólny portfel `3 z 5`.
-- Pełny klucz prywatny nie istnieje w jednym miejscu.
+- DKG and `t-of-n` threshold signing.
+- Example: shared `3-of-5` wallet.
+- The full private key is never held by one participant.
 
-## Slajd 2: Parametry kryptograficzne
+## Slide 2: Cryptographic Parameters
 
-- Python i `ecdsa`.
-- Krzywa `SECP256k1`.
-- Punkt bazowy `G` i rząd grupy `n`.
+- Python and `ecdsa`.
+- `SECP256k1` curve.
+- Base point `G` and group order `n`.
 - `setup_check.py`.
 
-## Slajd 3: Shamir Secret Sharing
+## Slide 3: Shamir Secret Sharing
 
-- Sekret jako `f(0)`.
-- Udziały jako punkty wielomianu.
-- Rekonstrukcja przez Lagrange'a.
+- Secret as `f(0)`.
+- Shares as polynomial points.
+- Reconstruction with Lagrange interpolation.
 
-## Slajd 4: Feldman VSS
+## Slide 4: Feldman VSS
 
-- Commitmenty `C_j = a_j*G`.
-- Weryfikacja `s_i*G`.
-- Ochrona przed nieuczciwym dealerem.
+- Commitments `C_j = a_j*G`.
+- Verification through `s_i*G`.
+- Protection against a dishonest dealer.
 
-## Slajd 5: DKG
+## Slide 5: DKG
 
-- Każdy uczestnik jest dealerem dla własnego sekretu.
-- Udziały są weryfikowane i sumowane.
-- Wspólny `PK` powstaje z publicznych commitmentów.
+- Each participant is a dealer for its own secret.
+- Shares are verified and summed.
+- Joint `PK` is derived from public commitments.
 
-## Slajd 6: Schnorr
+## Slide 6: Schnorr
 
 - `R = kG`.
 - `e = H(R, PK, m)`.
 - `s = k + eSK`.
-- Standardowa weryfikacja.
+- Standard verification equation.
 
-## Slajd 7: Podpis progowy
+## Slide 7: Threshold Signing
 
-- Każdy podpisujący ma tylko `sk_i`.
-- Partial signature `z_i`.
-- Agregacja do jednego podpisu `(R, s)`.
+- Each signer holds only `sk_i`.
+- Each signer creates a partial signature `z_i`.
+- Partial signatures aggregate into one `(R, s)` signature.
 
-## Slajd 8: Scenariusze testowe
+## Slide 8: Test Scenarios
 
-- Poprawny `3-of-5`.
-- Niepoprawny `2-of-5`.
-- Podmieniony udział VSS.
-- Podmieniony partial signature.
+- Valid `3-of-5`.
+- Invalid `2-of-5`.
+- Modified VSS share.
+- Modified partial signature.
 
-## Slajd 9: Demo
+## Slide 9: Demo
 
 - `python examples/dkg_demo.py`
 - `python examples/threshold_wallet_3of5.py`
 - `python examples/attack_t_minus_one.py`
+- `python examples/gui_app.py`
 
-## Slajd 10: Ograniczenia i wnioski
+## Slide 10: Limits and Conclusion
 
-- Implementacja akademicka, nie produkcyjny FROST.
-- Brak sieci i storage.
-- Cel matematyczny i demonstracyjny został osiągnięty.
+- Academic implementation, not production FROST.
+- No networking or persistent storage.
+- The mathematical and demonstration goals are met.
