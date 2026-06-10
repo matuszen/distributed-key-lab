@@ -32,6 +32,7 @@ from dkglab.vss.verification import verify_share
 
 DEFAULT_DKG_SECRETS = [11, 22, 33, 44, 55]
 DEFAULT_MESSAGE = "Hello world!"
+DEFAULT_SIGNERS = [1, 3, 5]
 
 
 @dataclass(frozen=True)
@@ -146,6 +147,112 @@ def threshold_wallet_demo(
     return TextResult(title="Threshold wallet", body=body)
 
 
+def workflow_dkg_summary() -> TextResult:
+    """Return a concise Polish DKG summary for the desktop app."""
+    result = _run_demo_dkg(num_participants=5, threshold=3)
+    checks = []
+    for participant in result.participants:
+        if participant.final_share is None:
+            raise RuntimeError("DKG participant has no final share.")
+        valid = verify_share(participant.final_share, result.aggregated_commitments)
+        checks.append(f"P{participant.id}: udzial zgodny z commitmentami = {valid}")
+
+    body = "\n".join(
+        [
+            "ETAP 1 - Distributed Key Generation",
+            "",
+            "Cel: wygenerowac wspolny klucz publiczny bez tworzenia pelnego SK w jednym miejscu.",
+            f"Model: {result.threshold} z {result.num_participants}",
+            f"Wspolny klucz publiczny PK: {_short_hex(point_to_hex(result.public_key))}",
+            f"Liczba wpisow transcriptu commitmentow: {len(result.commitment_transcript)}",
+            "",
+            "Weryfikacja finalnych udzialow:",
+            *checks,
+            "",
+            "Wniosek: kazdy uczestnik ma tylko swoj finalny udzial prywatny sk_i.",
+        ]
+    )
+    return TextResult(title="DKG - wspolny klucz publiczny", body=body)
+
+
+def workflow_signature_summary(
+    selected_ids: list[int],
+    message: str = DEFAULT_MESSAGE,
+) -> TextResult:
+    """Return a concise Polish threshold-signature summary for the desktop app."""
+    _validate_workflow_signers(selected_ids)
+    dkg_result = _run_demo_dkg(num_participants=5, threshold=3)
+    partials, signature, session = _sign_with_selected_participants(
+        dkg_result=dkg_result,
+        selected_ids=selected_ids,
+        message=message.encode("utf-8"),
+    )
+    is_valid = verify_signature(dkg_result.public_key, session.message, signature)
+    partial_lines = [
+        f"P{partial.participant_id}: czesc podpisu z_i zweryfikowana"
+        for partial in partials
+    ]
+
+    body = "\n".join(
+        [
+            "ETAP 2 - Podpis progowy Schnorra",
+            "",
+            "Cel: podpisac wiadomosc przez 3 uczestnikow bez odtwarzania pelnego SK.",
+            f"Wiadomosc: {message}",
+            f"Podpisujacy: {selected_ids}",
+            f"PK: {_short_hex(point_to_hex(dkg_result.public_key))}",
+            f"R: {_short_hex(point_to_hex(signature.R))}",
+            f"s: {_short_hex(scalar_to_hex(signature.s))}",
+            "",
+            "Czesci podpisu:",
+            *partial_lines,
+            "",
+            f"Finalny podpis przechodzi standardowa weryfikacje Schnorra: {is_valid}",
+        ]
+    )
+    return TextResult(title="TSS - podpis 3 z 5", body=body)
+
+
+def workflow_attack_summary() -> TextResult:
+    """Return a concise Polish t-1 attack simulation summary."""
+    dkg_result = _run_demo_dkg(num_participants=5, threshold=3)
+    selected_ids = {1, 2}
+    blocked_message = _expect_error(
+        lambda: ThresholdSigningSession(
+            selected_ids=selected_ids,
+            threshold=dkg_result.threshold,
+            message=b"attacker tries to sign with too few shares",
+            public_key=dkg_result.public_key,
+            aggregated_commitments=dkg_result.aggregated_commitments,
+        )
+    )
+    body = "\n".join(
+        [
+            "ETAP 3 - Scenariusz negatywny",
+            "",
+            "Cel: pokazac, ze mniej niz prog t nie wystarcza do podpisu.",
+            f"Proba podpisu przez: {sorted(selected_ids)}",
+            f"Wymagany prog: {dkg_result.threshold}",
+            f"Wynik: atak zablokowany ({blocked_message})",
+            "",
+            "Wniosek: system wymusza model t-of-n.",
+        ]
+    )
+    return TextResult(title="Atak t-1 - zablokowany", body=body)
+
+
+def full_workflow_summary(
+    selected_ids: list[int],
+    message: str = DEFAULT_MESSAGE,
+) -> TextResult:
+    """Return the complete DKG + threshold-signature scenario for the GUI."""
+    dkg = workflow_dkg_summary()
+    signature = workflow_signature_summary(selected_ids=selected_ids, message=message)
+    attack = workflow_attack_summary()
+    body = "\n\n".join([dkg.body, signature.body, attack.body])
+    return TextResult(title="Pelny scenariusz: DKG + podpis progowy", body=body)
+
+
 def attack_t_minus_one_demo(
     num_participants: int = 5,
     threshold: int = 3,
@@ -194,6 +301,19 @@ def parse_participant_ids(value: str) -> list[int]:
     if any(participant_id <= 0 for participant_id in parsed):
         raise ValueError("Participant ids must be positive.")
     return parsed
+
+
+def _validate_workflow_signers(selected_ids: list[int]) -> None:
+    if len(selected_ids) != 3:
+        raise ValueError("This scenario expects exactly 3 signing participants.")
+    if any(participant_id > 5 for participant_id in selected_ids):
+        raise ValueError("Selected participants must be in the range 1..5.")
+
+
+def _short_hex(value: str, prefix: int = 18, suffix: int = 10) -> str:
+    if len(value) <= prefix + suffix + 3:
+        return value
+    return f"{value[:prefix]}...{value[-suffix:]}"
 
 
 def _run_demo_dkg(num_participants: int, threshold: int) -> DKGResult:

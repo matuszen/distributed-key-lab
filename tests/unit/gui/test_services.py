@@ -4,9 +4,13 @@ from dkglab.gui.services import (
     attack_t_minus_one_demo,
     benchmark_dkg,
     curve_summary,
+    full_workflow_summary,
     parse_participant_ids,
     shamir_demo,
     threshold_wallet_demo,
+    workflow_attack_summary,
+    workflow_dkg_summary,
+    workflow_signature_summary,
 )
 
 
@@ -36,6 +40,45 @@ def test_threshold_wallet_demo_signs_message() -> None:
 def test_threshold_wallet_demo_rejects_unknown_participant() -> None:
     with pytest.raises(ValueError, match="must exist"):
         threshold_wallet_demo(selected_ids=[1, 3, 9], message="hello")
+
+
+def test_workflow_dkg_summary_is_project_focused() -> None:
+    result = workflow_dkg_summary()
+
+    assert result.title == "DKG - wspolny klucz publiczny"
+    assert "ETAP 1 - Distributed Key Generation" in result.body
+    assert "Model: 3 z 5" in result.body
+    assert "Wspolny klucz publiczny PK:" in result.body
+
+
+def test_workflow_signature_summary_signs_with_three_participants() -> None:
+    result = workflow_signature_summary(selected_ids=[1, 3, 5], message="hello")
+
+    assert result.title == "TSS - podpis 3 z 5"
+    assert "Podpisujacy: [1, 3, 5]" in result.body
+    assert "Finalny podpis przechodzi standardowa weryfikacje Schnorra: True" in result.body
+
+
+def test_workflow_signature_summary_requires_exactly_three_signers() -> None:
+    with pytest.raises(ValueError, match="exactly 3"):
+        workflow_signature_summary(selected_ids=[1, 2], message="hello")
+
+
+def test_workflow_attack_summary_explains_t_minus_one_block() -> None:
+    result = workflow_attack_summary()
+
+    assert result.title == "Atak t-1 - zablokowany"
+    assert "Proba podpisu przez: [1, 2]" in result.body
+    assert "Wynik: atak zablokowany" in result.body
+
+
+def test_full_workflow_summary_contains_all_core_steps() -> None:
+    result = full_workflow_summary(selected_ids=[1, 3, 5], message="hello")
+
+    assert result.title == "Pelny scenariusz: DKG + podpis progowy"
+    assert "ETAP 1 - Distributed Key Generation" in result.body
+    assert "ETAP 2 - Podpis progowy Schnorra" in result.body
+    assert "ETAP 3 - Scenariusz negatywny" in result.body
 
 
 def test_attack_t_minus_one_demo_is_blocked() -> None:

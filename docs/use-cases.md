@@ -83,4 +83,4 @@ After reinstalling the editable package, the script entry point is also availabl
 dkglab-gui
 ```
 
-The app exposes the same scenarios through forms: SSS, DKG, threshold signing, the `t-1` attack, and the benchmark.
+The app runs the main DKG + threshold-signature workflow: DKG, threshold signing, and the `t-1` attack check.

@@ -24,7 +24,7 @@ Implemented:
 - local Schnorr sign and verify,
 - threshold Schnorr partial signatures and aggregation,
 - positive and negative security scenarios,
-- Tkinter desktop application,
+- Tkinter desktop application for the DKG + TSS workflow,
 - example scripts and Markdown documentation.
 
 ## Project Structure
@@ -117,7 +117,7 @@ or, after reinstalling the editable package so the script entry point is refresh
 dkglab-gui
 ```
 
-The GUI uses standard `tkinter`. On some Linux installations you may need the system package `python3-tk`.
+The GUI uses standard `tkinter` and exposes the main DKG + threshold-signature workflow. On some Linux installations you may need the system package `python3-tk`.
 
 ## Documentation
 
