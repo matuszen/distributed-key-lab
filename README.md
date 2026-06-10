@@ -1,52 +1,139 @@
 # Distributed Key Lab
 
-## Target Functionality
+Academic Python lab for distributed key generation (DKG) and threshold Schnorr signatures.
 
-The project targets a complete pipeline for:
+The project demonstrates a complete educational `t-of-n` flow:
 
-- distributed key generation (DKG), where no single party holds the full private key,
-- threshold signatures, where any t-of-n participants can jointly produce a valid signature.
+- Shamir Secret Sharing,
+- Feldman Verifiable Secret Sharing,
+- in-memory DKG,
+- local Schnorr signatures,
+- threshold Schnorr signing without reconstructing the full private key.
 
-Core cryptographic components include:
+The implementation intentionally stays academic. It is suitable for learning, tests, and a university presentation. It is not a production FROST implementation.
 
-- Shamir Secret Sharing for secret splitting and recovery,
-- Verifiable Secret Sharing (Feldman) for share correctness checks,
-- Schnorr-style signing flow for local and threshold signature verification.
+## Project Status
+
+Implemented:
+
+- curve setup check for `SECP256k1`,
+- SSS split and recovery,
+- Feldman VSS commitments and share verification,
+- DKG participant simulation,
+- joint public key generation,
+- local Schnorr sign and verify,
+- threshold Schnorr partial signatures and aggregation,
+- positive and negative security scenarios,
+- Tkinter desktop application,
+- example scripts and Markdown documentation.
 
 ## Project Structure
 
-The repository uses a domain-oriented layout:
+- `src/dkglab/crypto`: elliptic-curve parameters and Schnorr primitives
+- `src/dkglab/secret_sharing`: Shamir splitting and Lagrange recovery
+- `src/dkglab/vss`: Feldman commitments and verification
+- `src/dkglab/protocols`: DKG and threshold signing orchestration
+- `examples`: runnable demo and attack scenarios
+- `src/dkglab/gui`: desktop application and GUI service layer
+- `tests/unit`: unit and smoke tests
+- `docs`: academic documentation, use cases, report, and presentation outline
 
-- src/dkglab/crypto: elliptic-curve parameters and crypto primitives
-- src/dkglab/secret_sharing: Shamir interpolation and secret recovery
-- src/dkglab/vss: Feldman commitments and share verification
-- src/dkglab/protocols: orchestration layer for DKG and threshold signing
-- tests/unit: unit tests grouped by domain
-- docs: setup and domain documentation
+## Setup
 
-## Run
-
-### Create and activate a virtual environment
+Create and activate a virtual environment:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### Install dependencies
+Install dependencies:
 
 ```bash
 pip install -e .[dev]
 ```
 
-### Validate the curve setup (secp256k1)
+Validate the curve setup:
 
 ```bash
-python3 setup_check.py
+python setup_check.py
 ```
 
-### Run tests
+Run tests and checks:
 
 ```bash
-pytest
+pytest -q
+ruff check .
+isort . --check-only --diff
 ```
+
+## Demos
+
+DKG round:
+
+```bash
+python examples/dkg_demo.py
+```
+
+Threshold wallet `3-of-5`:
+
+```bash
+python examples/threshold_wallet_3of5.py
+```
+
+Expected final line:
+
+```text
+Signature valid: True
+```
+
+Attack with only `t-1` participants:
+
+```bash
+python examples/attack_t_minus_one.py
+```
+
+Expected output:
+
+```text
+Attack blocked: Not enough selected participants for threshold.
+```
+
+Simple DKG benchmark:
+
+```bash
+python examples/benchmark_dkg.py
+```
+
+Desktop GUI:
+
+```bash
+python examples/gui_app.py
+```
+
+or, after reinstalling the editable package so the script entry point is refreshed:
+
+```bash
+dkglab-gui
+```
+
+The GUI uses standard `tkinter`. On some Linux installations you may need the system package `python3-tk`.
+
+## Documentation
+
+- [Requirements](docs/requirements.md)
+- [Setup](docs/setup.md)
+- [Shamir Secret Sharing](docs/sss.md)
+- [Feldman VSS](docs/vss-feldman.md)
+- [DKG](docs/dkg.md)
+- [Schnorr](docs/schnorr.md)
+- [Threshold Signing](docs/threshold-signing.md)
+- [Use Cases](docs/use-cases.md)
+- [Desktop GUI](docs/gui.md)
+- [Security Tests](docs/security-tests.md)
+- [Final Report](docs/report.md)
+- [Presentation Outline](docs/presentation.md)
+
+## Security Notes
+
+This project is a local educational simulation. It does not implement networking, persistent key storage, side-channel protections, or the full FROST protocol. Deterministic secrets and nonces appear in tests and demos for reproducibility; default protocol helpers use `secrets` where random values are needed.

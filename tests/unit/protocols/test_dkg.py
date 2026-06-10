@@ -1,5 +1,5 @@
-from dkglab.crypto.curves import GROUP_ORDER
-from dkglab.protocols.dkg import run_dkg
+from dkglab.crypto.curves import GENERATOR, GROUP_ORDER
+from dkglab.protocols.dkg import public_share_for_index, run_dkg
 from dkglab.protocols.participant import Participant
 from dkglab.secret_sharing.recovery import recover_secret
 from dkglab.utils.types import Share, VSSPackage
@@ -11,6 +11,9 @@ def test_dkg_round_aggregates_consistently() -> None:
     result = run_dkg(num_participants=5, threshold=3, secrets=secrets)
 
     aggregated_secret = sum(secrets) % GROUP_ORDER
+    assert result.num_participants == 5
+    assert result.threshold == 3
+    assert len(result.commitment_transcript) == 5
 
     commitments_list = []
     for participant in result.participants:
@@ -20,6 +23,10 @@ def test_dkg_round_aggregates_consistently() -> None:
     for participant in result.participants:
         assert participant.final_share is not None
         assert verify_share(participant.final_share, result.aggregated_commitments)
+        assert (
+            public_share_for_index(result.aggregated_commitments, participant.id)
+            == participant.final_share.y * GENERATOR
+        )
         assert (
             participant.compute_joint_public_key(commitments_list) == result.public_key
         )

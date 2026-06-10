@@ -16,9 +16,18 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
+class CommitmentTranscriptEntry:
+    participant_id: int
+    commitments: List[Point]
+
+
+@dataclass(frozen=True)
 class DKGResult:
+    num_participants: int
+    threshold: int
     participants: List[Participant]
     aggregated_commitments: List[Point]
+    commitment_transcript: List[CommitmentTranscriptEntry]
     public_key: Point
 
 
@@ -42,6 +51,24 @@ def aggregate_commitments(commitments_list: Sequence[Sequence[Point]]) -> List[P
     return aggregated
 
 
+def public_share_for_index(
+    aggregated_commitments: Sequence[Point],
+    participant_id: int,
+    modulus: int = GROUP_ORDER,
+) -> Point:
+    """Evaluate public commitments at participant index i to get F(i)G."""
+    if not aggregated_commitments:
+        raise ValueError("Aggregated commitments cannot be empty.")
+    if participant_id <= 0:
+        raise ValueError("Participant id must be positive.")
+
+    acc: Point = INFINITY
+    for power, commitment in enumerate(aggregated_commitments):
+        scalar = pow(participant_id, power, modulus)
+        acc = acc + scalar * commitment
+    return acc
+
+
 def run_dkg(
     num_participants: int, threshold: int, secrets: Sequence[int] | None = None
 ) -> DKGResult:
@@ -63,7 +90,7 @@ def run_dkg(
         secret = (
             secrets[idx]
             if secrets is not None
-            else secrets_module.randbelow(GROUP_ORDER)
+            else secrets_module.randbelow(GROUP_ORDER - 1) + 1
         )
         participant.generate_and_broadcast_shares(secret)
 
@@ -82,17 +109,27 @@ def run_dkg(
         participant.aggregate_final_share()
 
     commitments_list: List[List[Point]] = []
+    commitment_transcript: List[CommitmentTranscriptEntry] = []
     for participant in participants:
         if participant.commitments is None:
             raise ValueError("Commitments missing for a participant.")
         commitments_list.append(participant.commitments)
+        commitment_transcript.append(
+            CommitmentTranscriptEntry(
+                participant_id=participant.id,
+                commitments=list(participant.commitments),
+            )
+        )
 
     aggregated_commitments = aggregate_commitments(commitments_list)
     public_key = Participant.aggregate_public_key(commitments_list)
 
     logger.info("DKG completed for %s participants", num_participants)
     return DKGResult(
+        num_participants=num_participants,
+        threshold=threshold,
         participants=participants,
         aggregated_commitments=aggregated_commitments,
+        commitment_transcript=commitment_transcript,
         public_key=public_key,
     )
