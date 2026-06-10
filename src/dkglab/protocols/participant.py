@@ -71,11 +71,30 @@ class Participant:
 
     def receive_share(self, package: VSSPackage, from_id: int) -> bool:
         """Verify and store a share sent by another participant."""
+        if not (0 < from_id <= self.n):
+            raise ValueError("Sender id must be a valid participant id.")
+        if from_id == self.id:
+            logger.warning("Participant %s rejected a self-sent share", self.id)
+            return False
+        if from_id in self.received_shares:
+            logger.warning(
+                "Participant %s rejected duplicate share from %s",
+                self.id,
+                from_id,
+            )
+            return False
         if package.share.x != self.id:
             logger.warning(
                 "Participant %s received misrouted share for %s from %s",
                 self.id,
                 package.share.x,
+                from_id,
+            )
+            return False
+        if len(package.commitments) != self.t:
+            logger.warning(
+                "Participant %s rejected share from %s with invalid commitment count",
+                self.id,
                 from_id,
             )
             return False

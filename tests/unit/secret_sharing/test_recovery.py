@@ -3,6 +3,7 @@ from itertools import combinations
 import pytest
 
 from dkglab.crypto.curves import GROUP_ORDER
+from dkglab.secret_sharing.lagrange import lagrange_coefficient_at_zero
 from dkglab.secret_sharing.recovery import recover_secret
 from dkglab.utils.types import Share
 
@@ -41,3 +42,18 @@ def test_recover_secret_rejects_duplicate_indexes() -> None:
     shares = [Share(1, 10), Share(1, 20), Share(2, 30)]
     with pytest.raises(ValueError, match="unique"):
         recover_secret(shares, threshold=3)
+
+
+def test_lagrange_coefficients_work_for_non_consecutive_indexes() -> None:
+    secret = 42
+    shares = build_shares(secret=secret, coeffs_rest=[7, 11], n=5)
+    selected = [shares[1], shares[3], shares[4]]
+    xs = [share.x for share in selected]
+
+    recovered = 0
+    for share in selected:
+        lambda_i = lagrange_coefficient_at_zero(share.x, xs, GROUP_ORDER)
+        recovered = (recovered + share.y * lambda_i) % GROUP_ORDER
+
+    assert xs == [2, 4, 5]
+    assert recovered == secret

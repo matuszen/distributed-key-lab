@@ -14,9 +14,17 @@ def generate_coefficients(
 ) -> List[int]:
     if threshold <= 0:
         raise ValueError("Threshold must be greater than zero.")
-    return [secret % modulus] + [
-        secrets.randbelow(modulus) for _ in range(threshold - 1)
+    if not (0 < secret < modulus):
+        raise ValueError("Secret must be in the range [1, modulus-1].")
+
+    if threshold == 1:
+        return [secret]
+
+    middle_coefficients = [
+        secrets.randbelow(modulus) for _ in range(threshold - 2)
     ]
+    highest_coefficient = secrets.randbelow(modulus - 1) + 1
+    return [secret] + middle_coefficients + [highest_coefficient]
 
 
 def evaluate_polynomial(coefficients: Iterable[int], x: int, modulus: int) -> int:
