@@ -62,9 +62,9 @@ def main() -> None:
     print("Use case: threshold wallet 3-of-5")
     print("Message:", message.decode("utf-8"))
     print("Selected participants:", selected_ids)
-    print("Joint public key PK:", point_to_hex(dkg_result.public_key))
-    print("Aggregated nonce R:", point_to_hex(signature.R))
-    print("Signature scalar s:", scalar_to_hex(signature.s))
+    print("Joint public key:", point_to_hex(dkg_result.public_key))
+    print("Aggregated signing nonce point:", point_to_hex(signature.R))
+    print("Signature scalar:", scalar_to_hex(signature.s))
     print("Signature valid:", is_valid)
 
 

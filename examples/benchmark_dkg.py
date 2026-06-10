@@ -1,4 +1,4 @@
-"""Small academic benchmark for local DKG simulations."""
+"""Small academic benchmark for local distributed key generation simulations."""
 
 from time import perf_counter
 
@@ -8,7 +8,7 @@ from dkglab.protocols.dkg import run_dkg
 def main() -> None:
     configs = [(3, 2), (5, 3), (7, 4), (10, 6)]
 
-    print("DKG benchmark")
+    print("Distributed key generation benchmark")
     print("n,t,time_ms")
     for num_participants, threshold in configs:
         start = perf_counter()

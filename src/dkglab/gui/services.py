@@ -90,7 +90,7 @@ def dkg_demo(num_participants: int, threshold: int) -> TextResult:
     lines = [
         f"Participants: {result.num_participants}",
         f"Threshold: {result.threshold}",
-        f"Joint public key PK: {point_to_hex(result.public_key)}",
+        f"Joint public key: {point_to_hex(result.public_key)}",
         f"Commitment transcript entries: {len(result.commitment_transcript)}",
         "",
         "Final share checks:",
@@ -104,8 +104,9 @@ def dkg_demo(num_participants: int, threshold: int) -> TextResult:
             participant.id,
         )
         lines.append(
-            f"P{participant.id}: VSS={verify_share(participant.final_share, result.aggregated_commitments)}; "
-            f"public_share={point_to_hex(public_share)}"
+            f"Participant {participant.id}: share verified = "
+            f"{verify_share(participant.final_share, result.aggregated_commitments)}; "
+            f"public share = {point_to_hex(public_share)}"
         )
 
     return TextResult(title="Distributed Key Generation", body="\n".join(lines))
@@ -126,7 +127,7 @@ def threshold_wallet_demo(
     )
 
     partial_lines = [
-        f"P{partial.participant_id}: z_i={scalar_to_hex(partial.value)}"
+        f"Participant {partial.participant_id}: partial signature value = {scalar_to_hex(partial.value)}"
         for partial in partials
     ]
     is_valid = verify_signature(dkg_result.public_key, session.message, signature)
@@ -135,9 +136,9 @@ def threshold_wallet_demo(
             "Use case: threshold wallet 3-of-5",
             f"Message: {message}",
             f"Selected participants: {selected_ids}",
-            f"Joint public key PK: {point_to_hex(dkg_result.public_key)}",
-            f"Aggregated nonce R: {point_to_hex(signature.R)}",
-            f"Signature scalar s: {scalar_to_hex(signature.s)}",
+            f"Joint public key: {point_to_hex(dkg_result.public_key)}",
+            f"Aggregated signing nonce point: {point_to_hex(signature.R)}",
+            f"Signature scalar: {scalar_to_hex(signature.s)}",
             f"Signature valid: {is_valid}",
             "",
             "Partial signatures:",
@@ -155,24 +156,26 @@ def workflow_dkg_summary() -> TextResult:
         if participant.final_share is None:
             raise RuntimeError("DKG participant has no final share.")
         valid = verify_share(participant.final_share, result.aggregated_commitments)
-        checks.append(f"P{participant.id}: udzial zgodny z commitmentami = {valid}")
+        checks.append(
+            f"Uczestnik {participant.id}: udzial zgodny z publicznymi zobowiazaniami = {valid}"
+        )
 
     body = "\n".join(
         [
-            "ETAP 1 - Distributed Key Generation",
+            "ETAP 1 - Rozproszona generacja klucza",
             "",
-            "Cel: wygenerowac wspolny klucz publiczny bez tworzenia pelnego SK w jednym miejscu.",
+            "Cel: wygenerowac wspolny klucz publiczny bez tworzenia pelnego klucza prywatnego w jednym miejscu.",
             f"Model: {result.threshold} z {result.num_participants}",
-            f"Wspolny klucz publiczny PK: {_short_hex(point_to_hex(result.public_key))}",
-            f"Liczba wpisow transcriptu commitmentow: {len(result.commitment_transcript)}",
+            f"Wspolny klucz publiczny: {point_to_hex(result.public_key)}",
+            f"Liczba publicznych zobowiazan w rejestrze: {len(result.commitment_transcript)}",
             "",
             "Weryfikacja finalnych udzialow:",
             *checks,
             "",
-            "Wniosek: kazdy uczestnik ma tylko swoj finalny udzial prywatny sk_i.",
+            "Wniosek: kazdy uczestnik ma tylko swoj finalny udzial klucza prywatnego.",
         ]
     )
-    return TextResult(title="DKG - wspolny klucz publiczny", body=body)
+    return TextResult(title="Rozproszona generacja klucza - wspolny klucz publiczny", body=body)
 
 
 def workflow_signature_summary(
@@ -189,7 +192,7 @@ def workflow_signature_summary(
     )
     is_valid = verify_signature(dkg_result.public_key, session.message, signature)
     partial_lines = [
-        f"P{partial.participant_id}: czesc podpisu z_i zweryfikowana"
+        f"Uczestnik {partial.participant_id}: czesc podpisu zweryfikowana"
         for partial in partials
     ]
 
@@ -197,12 +200,12 @@ def workflow_signature_summary(
         [
             "ETAP 2 - Podpis progowy Schnorra",
             "",
-            "Cel: podpisac wiadomosc przez 3 uczestnikow bez odtwarzania pelnego SK.",
+            "Cel: podpisac wiadomosc przez 3 uczestnikow bez odtwarzania pelnego klucza prywatnego.",
             f"Wiadomosc: {message}",
             f"Podpisujacy: {selected_ids}",
-            f"PK: {_short_hex(point_to_hex(dkg_result.public_key))}",
-            f"R: {_short_hex(point_to_hex(signature.R))}",
-            f"s: {_short_hex(scalar_to_hex(signature.s))}",
+            f"Wspolny klucz publiczny: {point_to_hex(dkg_result.public_key)}",
+            f"Wspolny punkt losowy podpisu: {point_to_hex(signature.R)}",
+            f"Skalar podpisu: {scalar_to_hex(signature.s)}",
             "",
             "Czesci podpisu:",
             *partial_lines,
@@ -210,7 +213,7 @@ def workflow_signature_summary(
             f"Finalny podpis przechodzi standardowa weryfikacje Schnorra: {is_valid}",
         ]
     )
-    return TextResult(title="TSS - podpis 3 z 5", body=body)
+    return TextResult(title="Podpis progowy - podpis 3 z 5", body=body)
 
 
 def workflow_attack_summary() -> TextResult:
@@ -230,27 +233,15 @@ def workflow_attack_summary() -> TextResult:
         [
             "ETAP 3 - Scenariusz negatywny",
             "",
-            "Cel: pokazac, ze mniej niz prog t nie wystarcza do podpisu.",
+            "Cel: pokazac, ze mniej uczestnikow niz wymagany prog nie wystarcza do podpisu.",
             f"Proba podpisu przez: {sorted(selected_ids)}",
             f"Wymagany prog: {dkg_result.threshold}",
             f"Wynik: atak zablokowany ({blocked_message})",
             "",
-            "Wniosek: system wymusza model t-of-n.",
+            "Wniosek: system wymusza model progowy.",
         ]
     )
-    return TextResult(title="Atak t-1 - zablokowany", body=body)
-
-
-def full_workflow_summary(
-    selected_ids: list[int],
-    message: str = DEFAULT_MESSAGE,
-) -> TextResult:
-    """Return the complete DKG + threshold-signature scenario for the GUI."""
-    dkg = workflow_dkg_summary()
-    signature = workflow_signature_summary(selected_ids=selected_ids, message=message)
-    attack = workflow_attack_summary()
-    body = "\n\n".join([dkg.body, signature.body, attack.body])
-    return TextResult(title="Pelny scenariusz: DKG + podpis progowy", body=body)
+    return TextResult(title="Test progu - zablokowany", body=body)
 
 
 def attack_t_minus_one_demo(
@@ -276,7 +267,7 @@ def attack_t_minus_one_demo(
             f"Attack blocked: {blocked_message}",
         ]
     )
-    return TextResult(title="t-1 attack simulation", body=body)
+    return TextResult(title="Below-threshold attack simulation", body=body)
 
 
 def benchmark_dkg(configs: list[tuple[int, int]] | None = None) -> TextResult:
@@ -308,12 +299,6 @@ def _validate_workflow_signers(selected_ids: list[int]) -> None:
         raise ValueError("This scenario expects exactly 3 signing participants.")
     if any(participant_id > 5 for participant_id in selected_ids):
         raise ValueError("Selected participants must be in the range 1..5.")
-
-
-def _short_hex(value: str, prefix: int = 18, suffix: int = 10) -> str:
-    if len(value) <= prefix + suffix + 3:
-        return value
-    return f"{value[:prefix]}...{value[-suffix:]}"
 
 
 def _run_demo_dkg(num_participants: int, threshold: int) -> DKGResult:

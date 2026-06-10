@@ -2,11 +2,11 @@
 
 ## Goal
 
-The project includes a Python desktop application for the main DKG + threshold-signature workflow:
+The project includes a Python desktop application for the main distributed key generation and threshold-signature workflow:
 
-- DKG for the `3-of-5` scenario,
+- distributed key generation for the `3-of-5` scenario,
 - threshold Schnorr signing by exactly three selected participants,
-- a `t-1` attack simulation showing that two participants cannot produce a valid signature.
+- a negative scenario showing that two participants cannot produce a valid signature.
 
 The interface follows the same flow as the protocol: first the participants generate a joint public key, then selected participants produce a threshold signature, and finally the threshold condition is checked with a negative scenario.
 
@@ -50,8 +50,7 @@ python -m dkglab.gui.app
 
 - signer list, defaulting to `1,3,5`,
 - message input, defaulting to `Hello world!`,
-- one full scenario button,
-- three step buttons: DKG, threshold signature, and `t-1` attack,
-- a text panel with the protocol output.
+- three step buttons: distributed key generation, threshold signature, and the too-few-participants check,
+- a scrollable text panel with the protocol output.
 
-The fastest way to run the full flow is to click `Uruchom pelny scenariusz`. Individual steps can also be rerun separately.
+Run the steps in order: first distributed key generation, then threshold signing, then the too-few-participants check. The joint public key, the shared signing nonce point, and the signature scalar are printed in full.

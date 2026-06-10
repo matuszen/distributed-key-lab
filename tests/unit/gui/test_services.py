@@ -4,7 +4,6 @@ from dkglab.gui.services import (
     attack_t_minus_one_demo,
     benchmark_dkg,
     curve_summary,
-    full_workflow_summary,
     parse_participant_ids,
     shamir_demo,
     threshold_wallet_demo,
@@ -44,19 +43,38 @@ def test_threshold_wallet_demo_rejects_unknown_participant() -> None:
 
 def test_workflow_dkg_summary_is_project_focused() -> None:
     result = workflow_dkg_summary()
+    pk_line = next(line for line in result.body.splitlines() if line.startswith("Wspolny klucz publiczny: "))
 
-    assert result.title == "DKG - wspolny klucz publiczny"
-    assert "ETAP 1 - Distributed Key Generation" in result.body
+    assert result.title == "Rozproszona generacja klucza - wspolny klucz publiczny"
+    assert "ETAP 1 - Rozproszona generacja klucza" in result.body
     assert "Model: 3 z 5" in result.body
-    assert "Wspolny klucz publiczny PK:" in result.body
+    assert "Wspolny klucz publiczny:" in result.body
+    assert "Wspolny klucz publiczny PK:" not in result.body
+    assert "SK" not in result.body
+    assert len(pk_line.removeprefix("Wspolny klucz publiczny: ")) == 130
+    assert "..." not in result.body
 
 
 def test_workflow_signature_summary_signs_with_three_participants() -> None:
     result = workflow_signature_summary(selected_ids=[1, 3, 5], message="hello")
+    pk_line = next(line for line in result.body.splitlines() if line.startswith("Wspolny klucz publiczny: "))
+    nonce_line = next(line for line in result.body.splitlines() if line.startswith("Wspolny punkt losowy podpisu: "))
+    scalar_line = next(line for line in result.body.splitlines() if line.startswith("Skalar podpisu: "))
 
-    assert result.title == "TSS - podpis 3 z 5"
+    assert result.title == "Podpis progowy - podpis 3 z 5"
     assert "Podpisujacy: [1, 3, 5]" in result.body
     assert "Finalny podpis przechodzi standardowa weryfikacje Schnorra: True" in result.body
+    assert "Wspolny klucz publiczny: 04" in result.body
+    assert "Wspolny punkt losowy podpisu: 04" in result.body
+    assert "PK:" not in result.body
+    assert "R:" not in result.body
+    assert "s:" not in result.body
+    assert "SK" not in result.body
+    assert "TSS" not in result.title
+    assert len(pk_line.removeprefix("Wspolny klucz publiczny: ")) == 130
+    assert len(nonce_line.removeprefix("Wspolny punkt losowy podpisu: ")) == 130
+    assert len(scalar_line.removeprefix("Skalar podpisu: ")) == 64
+    assert "..." not in result.body
 
 
 def test_workflow_signature_summary_requires_exactly_three_signers() -> None:
@@ -67,18 +85,10 @@ def test_workflow_signature_summary_requires_exactly_three_signers() -> None:
 def test_workflow_attack_summary_explains_t_minus_one_block() -> None:
     result = workflow_attack_summary()
 
-    assert result.title == "Atak t-1 - zablokowany"
+    assert result.title == "Test progu - zablokowany"
     assert "Proba podpisu przez: [1, 2]" in result.body
     assert "Wynik: atak zablokowany" in result.body
-
-
-def test_full_workflow_summary_contains_all_core_steps() -> None:
-    result = full_workflow_summary(selected_ids=[1, 3, 5], message="hello")
-
-    assert result.title == "Pelny scenariusz: DKG + podpis progowy"
-    assert "ETAP 1 - Distributed Key Generation" in result.body
-    assert "ETAP 2 - Podpis progowy Schnorra" in result.body
-    assert "ETAP 3 - Scenariusz negatywny" in result.body
+    assert "t-1" not in result.title
 
 
 def test_attack_t_minus_one_demo_is_blocked() -> None:

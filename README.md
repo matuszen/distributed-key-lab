@@ -1,30 +1,30 @@
 # Distributed Key Lab
 
-Academic Python lab for distributed key generation (DKG) and threshold Schnorr signatures.
+Academic Python lab for distributed key generation and threshold Schnorr signatures.
 
 The project demonstrates a complete educational `t-of-n` flow:
 
 - Shamir Secret Sharing,
 - Feldman Verifiable Secret Sharing,
-- in-memory DKG,
+- in-memory distributed key generation,
 - local Schnorr signatures,
 - threshold Schnorr signing without reconstructing the full private key.
 
-The implementation intentionally stays academic. It is suitable for learning, tests, and a university presentation. It is not a production FROST implementation.
+It is suitable for learning and tests. It is not a production FROST implementation.
 
 ## Project Status
 
 Implemented:
 
 - curve setup check for `SECP256k1`,
-- SSS split and recovery,
-- Feldman VSS commitments and share verification,
-- DKG participant simulation,
+- Shamir Secret Sharing split and recovery,
+- Feldman verifiable commitments and share verification,
+- distributed key generation participant simulation,
 - joint public key generation,
 - local Schnorr sign and verify,
 - threshold Schnorr partial signatures and aggregation,
 - positive and negative security scenarios,
-- Tkinter desktop application for the DKG + TSS workflow,
+- Tkinter desktop application for the distributed key generation and threshold-signature workflow,
 - example scripts and Markdown documentation.
 
 ## Project Structure
@@ -32,11 +32,11 @@ Implemented:
 - `src/dkglab/crypto`: elliptic-curve parameters and Schnorr primitives
 - `src/dkglab/secret_sharing`: Shamir splitting and Lagrange recovery
 - `src/dkglab/vss`: Feldman commitments and verification
-- `src/dkglab/protocols`: DKG and threshold signing orchestration
+- `src/dkglab/protocols`: distributed key generation and threshold signing orchestration
 - `examples`: runnable demo and attack scenarios
 - `src/dkglab/gui`: desktop application and GUI service layer
 - `tests/unit`: unit and smoke tests
-- `docs`: academic documentation, use cases, report, and presentation outline
+- `docs`: documentation, use cases and report
 
 ## Setup
 
@@ -69,7 +69,7 @@ isort . --check-only --diff
 
 ## Demos
 
-DKG round:
+Distributed key generation round:
 
 ```bash
 python examples/dkg_demo.py
@@ -87,7 +87,7 @@ Expected final line:
 Signature valid: True
 ```
 
-Attack with only `t-1` participants:
+Attack with too few participants:
 
 ```bash
 python examples/attack_t_minus_one.py
@@ -99,7 +99,7 @@ Expected output:
 Attack blocked: Not enough selected participants for threshold.
 ```
 
-Simple DKG benchmark:
+Simple distributed key generation benchmark:
 
 ```bash
 python examples/benchmark_dkg.py
@@ -117,22 +117,21 @@ or, after reinstalling the editable package so the script entry point is refresh
 dkglab-gui
 ```
 
-The GUI uses standard `tkinter` and exposes the main DKG + threshold-signature workflow. On some Linux installations you may need the system package `python3-tk`.
+The GUI uses standard `tkinter` and exposes the main distributed key generation and threshold-signature workflow. On some Linux installations you may need the system package `python3-tk`.
 
 ## Documentation
 
 - [Requirements](docs/requirements.md)
 - [Setup](docs/setup.md)
 - [Shamir Secret Sharing](docs/sss.md)
-- [Feldman VSS](docs/vss-feldman.md)
-- [DKG](docs/dkg.md)
+- [Feldman Verifiable Secret Sharing](docs/vss-feldman.md)
+- [Distributed Key Generation](docs/dkg.md)
 - [Schnorr](docs/schnorr.md)
 - [Threshold Signing](docs/threshold-signing.md)
 - [Use Cases](docs/use-cases.md)
 - [Desktop GUI](docs/gui.md)
 - [Security Tests](docs/security-tests.md)
 - [Final Report](docs/report.md)
-- [Presentation Outline](docs/presentation.md)
 
 ## Security Notes
 

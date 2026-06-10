@@ -1,4 +1,4 @@
-"""Tkinter desktop application for the DKG + TSS project workflow."""
+"""Tkinter desktop application for the distributed-key project workflow."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ from dkglab.gui.services import (
     DEFAULT_MESSAGE,
     DEFAULT_SIGNERS,
     TextResult,
-    full_workflow_summary,
     parse_participant_ids,
     workflow_attack_summary,
     workflow_dkg_summary,
@@ -19,11 +18,11 @@ from dkglab.gui.services import (
 
 
 class DistributedKeyLabApp(tk.Tk):
-    """Desktop UI for the DKG + threshold signature flow."""
+    """Desktop UI for the distributed key generation and threshold signature flow."""
 
     def __init__(self) -> None:
         super().__init__()
-        self.title("Distributed Key Lab - DKG + TSS")
+        self.title("Distributed Key Lab")
         self.geometry("1080x680")
         self.minsize(940, 600)
 
@@ -87,7 +86,7 @@ class DistributedKeyLabApp(tk.Tk):
         )
         ttk.Label(
             header,
-            text="Glowny przeplyw projektu: DKG -> podpis progowy -> kontrola progu",
+            text="Glowny przeplyw projektu: rozproszona generacja klucza -> podpis progowy -> kontrola progu",
             style="HeaderSub.TLabel",
         ).grid(row=1, column=0, sticky="w", pady=(4, 0))
 
@@ -118,64 +117,76 @@ class DistributedKeyLabApp(tk.Tk):
 
         ttk.Button(
             controls,
-            text="Uruchom pelny scenariusz",
-            command=self._run_full_demo,
-        ).grid(row=3, column=0, columnspan=2, sticky="ew", pady=(14, 10))
-
-        ttk.Button(
-            controls,
-            text="1. DKG: wygeneruj PK",
+            text="1. Wygeneruj wspolny klucz publiczny",
             style="Secondary.TButton",
             command=lambda: self._run_action(workflow_dkg_summary),
-        ).grid(row=4, column=0, columnspan=2, sticky="ew", pady=(0, 8))
+        ).grid(row=3, column=0, columnspan=2, sticky="ew", pady=(14, 8))
         ttk.Button(
             controls,
             text="2. Podpis progowy",
             style="Secondary.TButton",
             command=self._run_signature_demo,
-        ).grid(row=5, column=0, columnspan=2, sticky="ew", pady=(0, 8))
+        ).grid(row=4, column=0, columnspan=2, sticky="ew", pady=(0, 8))
         ttk.Button(
             controls,
-            text="3. Atak t-1",
+            text="3. Test zbyt malej liczby uczestnikow",
             style="Secondary.TButton",
             command=lambda: self._run_action(workflow_attack_summary),
-        ).grid(row=6, column=0, columnspan=2, sticky="ew", pady=(0, 14))
+        ).grid(row=5, column=0, columnspan=2, sticky="ew", pady=(0, 14))
+
+        ttk.Label(
+            controls,
+            text="Co pokazuje aplikacja",
+            style="CardTitle.TLabel",
+        ).grid(row=6, column=0, columnspan=2, sticky="w", pady=(8, 8))
+        ttk.Label(
+            controls,
+            text=(
+                "Najpierw uruchom rozproszona generacje klucza, aby pokazac wspolny klucz publiczny i "
+                "zweryfikowane udzialy uczestnikow. Nastepnie wykonaj podpis progowy "
+                "dla wybranej wiadomosci. Na koncu sprawdz scenariusz z dwoma uczestnikami, ktory "
+                "potwierdza, ze dwoch uczestnikow nie moze podpisac w modelu 3 z 5."
+            ),
+            style="Muted.TLabel",
+            wraplength=290,
+        ).grid(row=7, column=0, columnspan=2, sticky="ew", pady=(0, 12))
 
         ttk.Label(
             controls,
             text=(
-                "Aplikacja prowadzi przez kompletny scenariusz: utworzenie wspolnego PK, "
-                "wygenerowanie podpisu 3 z 5 oraz sprawdzenie warunku progowego."
+                "Wynik po prawej pokazuje pelne wartosci: wspolny klucz publiczny, "
+                "wspolny punkt losowy podpisu oraz skalar podpisu. "
+                "Dlugie ciagi heksadecymalne sa zawijane w panelu tekstowym."
             ),
             style="Muted.TLabel",
             wraplength=290,
-        ).grid(row=7, column=0, columnspan=2, sticky="ew")
+        ).grid(row=8, column=0, columnspan=2, sticky="ew")
+
+        output_frame = ttk.Frame(main)
+        output_frame.grid(row=0, column=1, sticky="nsew")
+        output_frame.columnconfigure(0, weight=1)
+        output_frame.rowconfigure(0, weight=1)
 
         self.output = tk.Text(
-            main,
+            output_frame,
             bg="#0f172a",
             fg="#e5e7eb",
             insertbackground="#e5e7eb",
             relief="flat",
-            wrap="word",
+            wrap="char",
             padx=18,
             pady=18,
             font=("Cascadia Mono", 10),
             height=24,
         )
-        self.output.grid(row=0, column=1, sticky="nsew")
+        self.output.grid(row=0, column=0, sticky="nsew")
+
+        scrollbar = ttk.Scrollbar(output_frame, orient="vertical", command=self.output.yview)
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        self.output.configure(yscrollcommand=scrollbar.set)
 
         self.status = ttk.Label(self, text="Ready", style="Status.TLabel")
         self.status.grid(row=2, column=0, sticky="ew")
-
-    def _run_full_demo(self) -> None:
-        def action() -> TextResult:
-            return full_workflow_summary(
-                selected_ids=parse_participant_ids(self.signers_var.get()),
-                message=self.message_var.get(),
-            )
-
-        self._run_action(action)
 
     def _run_signature_demo(self) -> None:
         def action() -> TextResult:
@@ -215,11 +226,11 @@ class DistributedKeyLabApp(tk.Tk):
         return TextResult(
             title="Distributed Key Lab",
             body=(
-                "Aplikacja uruchamia glowny przeplyw DKG + podpisu progowego.\n\n"
-                "1. DKG generuje wspolny klucz publiczny PK.\n"
+                "Aplikacja uruchamia glowny przeplyw rozproszonej generacji klucza i podpisu progowego.\n\n"
+                "1. Uczestnicy generuja wspolny klucz publiczny.\n"
                 "2. Trzech wybranych uczestnikow tworzy podpis progowy Schnorra.\n"
-                "3. Proba podpisu przez mniej niz prog t jest odrzucana.\n\n"
-                "Aby wykonac caly proces, kliknij 'Uruchom pelny scenariusz'."
+                "3. Proba podpisu przez mniej niz wymagany prog jest odrzucana.\n\n"
+                "Uruchom kroki po kolei przyciskami po lewej stronie."
             ),
         )
 
